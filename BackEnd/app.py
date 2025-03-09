@@ -1,4 +1,3 @@
-# filepath: c:\Users\saikr\OneDrive\Desktop\ai_email_generator\BackEnd\app.py
 from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
 from tone_analyzer import analyze_tone
@@ -12,20 +11,17 @@ from fastapi.staticfiles import StaticFiles
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5500"],  # Allow only trusted origins
+    allow_origins=["http://127.0.0.1:5500"], 
     allow_credentials=True,
     allow_methods=["POST", "GET"],
     allow_headers=["Content-Type"],
 )
 
-# Serve static files
 app.mount("/static", StaticFiles(directory="../FrontEnd"), name="static")
 
-# Include feedback router
 app.include_router(feedback_router)
 
-# Configure GenAI API Key
-genai.configure(api_key=("AIzaSyAlFvGmE0bu7nTnUqlu1QI1ipaSa_1YaFI"))  # Hardcoded (not recommended)
+genai.configure(api_key=("genai_api_key"))  
 
 class EmailRequest(BaseModel):
     recipient_name: str
@@ -38,24 +34,23 @@ class EmailRequest(BaseModel):
 @app.post("/generate-email")
 async def generate_email(request: EmailRequest):
     try:
-        model = genai.GenerativeModel("gemini-1.5-pro")  # Use Google's AI model
+        model = genai.GenerativeModel("gemini-1.5-pro")  
         detected_language = None
         words = request.context.lower().split()
         for i, word in enumerate(words):
-            if word == "in" and i + 1 < len(words):  # Example: "in Hindi"
+            if word == "in" and i + 1 < len(words):
                 detected_language = words[i + 1].capitalize()
-            elif word == "written" and i + 2 < len(words) and words[i + 1] == "in":  # Example: "written in Russian"
+            elif word == "written" and i + 2 < len(words) and words[i + 1] == "in": 
                 detected_language = words[i + 2].capitalize()
                 break
 
-        # Determine the response language based on user input
         if detected_language:
             if "written in" in request.context.lower():
-                response_language = request.language  # Use user-specified language (default: English)
+                response_language = request.language 
             else:
-                response_language = detected_language  # Use the detected language from context
+                response_language = detected_language 
         else:
-            response_language = request.language  # Default user-selected language
+            response_language = request.language 
 
         prompt = f"""
         Write a {request.tone} email in {response_language} to {request.recipient_name} ({request.recipient_email}).
@@ -87,7 +82,6 @@ async def save_preferences(
     user_info: dict = Depends(verify_token)
 ):
     user_id = user_info["uid"]
-    # Save preferences to database
     return {"status": "success"}
 
 @app.get("/")
