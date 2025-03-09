@@ -1,3 +1,4 @@
+# filepath: c:\Users\saikr\OneDrive\Desktop\ai_email_generator\BackEnd\app.py
 from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
 from tone_analyzer import analyze_tone
@@ -5,8 +6,8 @@ from feedback import provide_feedback, router as feedback_router
 from auth import verify_token
 import google.generativeai as genai
 import os
-
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 app.add_middleware(
@@ -17,19 +18,22 @@ app.add_middleware(
     allow_headers=["Content-Type"],
 )
 
+# Serve static files
+app.mount("/static", StaticFiles(directory="../FrontEnd"), name="static")
 
 # Include feedback router
 app.include_router(feedback_router)
 
 # Configure GenAI API Key
 genai.configure(api_key=("AIzaSyAlFvGmE0bu7nTnUqlu1QI1ipaSa_1YaFI"))  # Hardcoded (not recommended)
+
 class EmailRequest(BaseModel):
     recipient_name: str
     recipient_email: str
     context: str
     purpose: str
     tone: str = "professional"
-    language: str="english"
+    language: str = "english"
 
 @app.post("/generate-email")
 async def generate_email(request: EmailRequest):
@@ -77,7 +81,6 @@ async def generate_email(request: EmailRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/user/preferences")
 async def save_preferences(
     preferences: dict,
@@ -86,6 +89,7 @@ async def save_preferences(
     user_id = user_info["uid"]
     # Save preferences to database
     return {"status": "success"}
+
 @app.get("/")
 def read_root():
     return {"message": "AI Email Generator API is running!"}
