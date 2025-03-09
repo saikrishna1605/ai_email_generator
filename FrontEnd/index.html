@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Email Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>AI Email Generator</h1>
+        <form id="emailForm">
+            <div class="form-group">
+                <label for="recipientName">Recipient Name</label>
+                <input type="text" id="recipientName" required>
+            </div>
+            <div class="form-group">
+                <label for="recipientEmail">Recipient Email</label>
+                <input type="email" id="recipientEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="context">Context</label>
+                <textarea id="context" rows="4" required placeholder="Describe your relationship and relevant background information"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="purpose">Purpose</label>
+                <select id="purpose" required>
+                    <option value="follow-up">Follow-up</option>
+                    <option value="introduction">Introduction</option>
+                    <option value="request">Request</option>
+                    <option value="thank-you">Thank You</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="tone">Tone</label>
+                <select id="tone">
+                    <option value="professional">Professional</option>
+                    <option value="friendly">Friendly</option>
+                    <option value="formal">Formal</option>
+                    <option value="casual">Casual</option>
+                </select>
+            </div>
+            <button type="submit">Generate Email</button>
+        </form>
+        <div id="result" class="">
+            <h2>Generated Email</h2>
+            <div id="emailContent"></div>
+            <button id="sendButton">Send with SendGrid</button>
+            <button id="copyButton">Copy to Clipboard</button>
+            <button id="regenerateButton">Regenerate</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
