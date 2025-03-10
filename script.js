@@ -1,31 +1,35 @@
-// script.js
 document.addEventListener("DOMContentLoaded", () => {
     console.log("JavaScript Loaded!");
+
     const sendButton = document.getElementById("sendButton");
     const regenerateButton = document.getElementById("regenerateButton");
-    if (sendButton) 
-        {
+    const emailForm = document.getElementById("emailForm");
+    const result = document.getElementById("result");
+    const emailContent = document.getElementById("emailContent");
+    const copyButton = document.getElementById("copyButton");
+
+    if (sendButton) {
         sendButton.addEventListener("click", async () => {
-            console.log("SendGrid button clicked!");  // ✅ Debugging Step
-            alert(" feature is not implemented yet.");
+            console.log("SendGrid button clicked!");
+
             const recipientEmail = document.getElementById("recipientEmail").value;
             const senderEmail = document.getElementById("senderEmail").value;
-            const fullContent = document.getElementById("emailContent").innerText.trim();
-            
+            const fullContent = emailContent.innerText.trim();
+
             if (!recipientEmail || !fullContent) {
                 alert("Recipient email or content is missing!");
                 return;
             }
 
             const sendData = {
-                from_email: senderEmail,     // ✅ Match backend expected key
-                to_email: recipientEmail,    // ✅ Match backend expected key
+                from_email: senderEmail,
+                to_email: recipientEmail,
                 subject: "AI-Generated Email",
-                content: fullContent         // ✅ Match backend expected key
+                content: fullContent
             };
-    
+
             try {
-                const API_URL = "http://127.0.0.1:8000";
+                const API_URL = "http://127.0.0.1:8001";
                 const response = await fetch(`${API_URL}/email/send-email`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -33,7 +37,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
                 }
 
                 console.log("Email sent successfully!");
@@ -43,110 +48,65 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert(`Failed to send email: ${error.message}`);
             }
         });
-    } 
-    else {
+    } else {
         console.log("Send button not found!");
     }
 
-    regenerateButton.addEventListener("click", () => {
-        console.log("Regenerate button clicked!");  // ✅ Debugging Step
-        alert("Regenerate feature is not implemented yet.");
-    });
-    const emailForm = document.getElementById('emailForm');
-    const result = document.getElementById('result');
-    const emailContent = document.getElementById('emailContent');
-    const copyButton = document.getElementById('copyButton');
-    
-    emailForm.addEventListener('submit', async (e) => {
+    if (regenerateButton) {
+        regenerateButton.addEventListener("click", () => {
+            emailForm.dispatchEvent(new Event("submit"));
+        });
+    } else {
+        console.log("Regenerate button not found!");
+    }
+
+    emailForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const data = {
-            recipient_name: document.getElementById('recipientName').value,
-            recipient_email: document.getElementById('recipientEmail').value,
-            context: document.getElementById('context').value,
-            purpose: document.getElementById('purpose').value,
-            tone: document.getElementById('tone').value
-        };
-    
+
+        const formData = new FormData();
+        formData.append("recipient_name", document.getElementById("recipientName").value);
+        formData.append("recipient_email", document.getElementById("recipientEmail").value);
+        formData.append("context", document.getElementById("context").value);
+        formData.append("purpose", document.getElementById("purpose").value);
+        formData.append("tone", document.getElementById("tone").value);
+
+        const fileInput = document.getElementById("attachments");
+        for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append("files", fileInput.files[i]);
+        }
+
         try {
-            const API_URL = "http://127.0.0.1:8000";
+            const API_URL = "http://127.0.0.1:8001";
             const response = await fetch(`${API_URL}/generate-email`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
+                method: "POST",
+                body: formData, // No need to set Content-Type manually
             });
-    
+
             if (!response.ok) {
-                const errorText = await response.text();  // Get error message
+                const errorText = await response.text();
                 throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
             }
-    
+
             const responseData = await response.json();
-            emailContent.innerHTML = `<p><strong>Generated Email:</strong></p>${responseData.email_content.replace(/\n/g, '<br>')}`;
-            result.style.display = "block";  // Force show result
+            emailContent.innerHTML = `<p><strong>Generated Email:</strong></p>${responseData.email_content.replace(/\n/g, "<br>")}`;
+            result.style.display = "block";
         } catch (error) {
-            console.error('Error:', error);
+            console.error("Error:", error);
             alert(`Failed to generate email. Reason: ${error.message}`);
         }
-    });  
-    copyButton.addEventListener('click', () => {
-        const range = document.createRange();
-        range.selectNode(emailContent);
-        window.getSelection().removeAllRanges();
-        window.getSelection().addRange(range);
-        document.execCommand('copy');
-        window.getSelection().removeAllRanges();
-        alert('Email copied to clipboard!');
     });
+
+    if (copyButton) {
+        copyButton.addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(emailContent.innerText.trim());
+                alert("Email copied to clipboard!");
+            } catch (error) {
+                console.error("Clipboard Copy Failed:", error);
+                alert("Failed to copy text. Try manually copying.");
+            }
+        });
+    } else {
+        console.log("Copy button not found!");
+    }
 });
-// document.addEventListener('DOMContentLoaded', () => {
-//     console.log("JavaScript Loaded!");
-        
-    // regenerateButton.addEventListener('click', async () => {
-    //     // Resubmit the form to generate a new email
-    //     emailForm.dispatchEvent(new Event('submit'));
-    // });
-    
-    
-    // sendButton.addEventListener("click", async () => {
-    //     console.log("SendGrid button clicked!");  // ✅ Debugging step
-    
-    //     const recipientEmail = document.getElementById("recipientEmail").value;
-    //     const senderEmail = document.getElementById("senderEmail").value;
-        
-    //     const fullContent = emailContent.innerText || emailContent.textContent;
-    //     const emailText = fullContent.replace(/Generated Email:\s*/i, "").trim();
-        
-    //     const purpose = document.getElementById("purpose").value;
-    //     const subject = `${purpose.charAt(0).toUpperCase() + purpose.slice(1)} Email`;
-        
-    //     const sendData = {
-    //         email_content: emailText,
-    //         recipient_email: recipientEmail,
-    //         sender_email: senderEmail,
-    //         subject: subject
-    //     };
-        
-    //     console.log("Sending data:", sendData);  // ✅ Debugging step
-        
-    //     try {
-    //         const API_URL = "http://127.0.0.1:8000";
-    //         const response = await fetch(`${API_URL}/email/send-email`, {
-    //             method: "POST",
-    //             headers: { "Content-Type": "application/json" },
-    //             body: JSON.stringify(sendData),
-    //         });
-    
-    //         if (!response.ok) {
-    //             const errorText = await response.text();
-    //             throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
-    //         }
-    
-    //         const responseData = await response.json();
-    //         alert("Email sent successfully!");
-    //     } catch (error) {
-    //         console.error("Error:", error);
-    //         alert(`Failed to send email. Reason: ${error.message}`);
-    //     }
-    // });    
-    // Additional event handlers would go here
-// });

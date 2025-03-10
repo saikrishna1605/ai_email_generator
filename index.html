@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <h1>AI Email Generator</h1>
-        <form id="emailForm">
+        <form id="emailForm" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="recipientName">Recipient Name</label>
                 <input type="text" id="recipientName" required>
@@ -25,6 +25,10 @@
             <div class="form-group">
                 <label for="context">Context</label>
                 <textarea id="context" rows="4" required placeholder="Describe your relationship and relevant background information"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="attachments">Upload Files or Images</label>
+                <input type="file" id="attachments" multiple>
             </div>
             <div class="form-group">
                 <label for="purpose">Purpose</label>
@@ -46,13 +50,12 @@
             </div>
             <button type="submit">Generate Email</button>
         </form>
-        <div id="result" class="">
+        <div id="result" style="display: none;">
             <h2>Generated Email</h2>
             <div id="emailContent"></div>
             <button id="sendButton">Send with SendGrid</button>
             <button id="copyButton">Copy to Clipboard</button>
             <button id="regenerateButton">Regenerate</button>
-            
         </div>
     </div>
     <script src="script.js"></script>
