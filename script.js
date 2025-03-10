@@ -90,7 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const responseData = await response.json();
             emailContent.innerHTML = `<p><strong>Generated Email:</strong></p>${responseData.email_content.replace(/\n/g, "<br>")}`;
             result.style.display = "block";
-        } catch (error) {
+        } 
+        catch (error) {
             console.error("Error:", error);
             alert(`Failed to generate email. Reason: ${error.message}`);
         }
