@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+firebase-admin
+sendgrid
+pydantic
+pytesseract
+python-dotenv
+pdfplumber
+pillow
+python-multipart
