@@ -5,7 +5,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 # Initialize Firebase
-cred = credentials.Certificate("firebase_credintials.json")
+cred = credentials.Certificate("")
 firebase_admin.initialize_app(cred)
 security = HTTPBearer()
 
